@@ -16,12 +16,14 @@ public class PlantBehaviour : MonoBehaviour
 
     private int _stage = 0;
     private bool _canBeHarvested = false;
+    private float _elapsedTime = 0;
 
     private UnityEvent _onGrowth;
     private UnityEvent _onGrowthTemp;
 
     public int Stage { get { return _stage; } }
     public bool CanBeHarvested { get { return _canBeHarvested; } }
+    public int Yield { get { return _yield; } }
 
     public void AddOnGrowthAction(UnityAction action) => _onGrowth.AddListener(action);
     public void AddOnGrowthTempAction(UnityAction action) => _onGrowthTemp.AddListener(action);
@@ -40,11 +42,40 @@ public class PlantBehaviour : MonoBehaviour
 
     private void Update()
     {
-        
+        if (_stage >= _stages.Count - 1)
+            return;
+
+        float timeBetweenGrowth = _growthTime / _stages.Count;
+
+        _elapsedTime += Time.deltaTime;
+
+        if (_elapsedTime >= timeBetweenGrowth)
+        {
+            _elapsedTime = 0;
+            Grow();
+        }
     }
 
     private void Grow()
     {
+        if (_stage >= _stages.Count - 1)
+            return;
 
+        _stage += 1;
+
+        if (_stage == _stages.Count - 1)
+            _canBeHarvested = true;
+
+        for (int i = 0; i < _stages.Count; i++)
+            _stages[i].SetActive(false);
+
+        _stages[_stage].SetActive(true);
+
+        _onGrowth?.Invoke();
+        _onGrowthTemp?.Invoke();
+
+        _onGrowthTemp?.RemoveAllListeners();
+
+        Debug.Log("Growing plant. Current stage: " + _stage.ToString() + " / " + (_stages.Count - 1).ToString() + ". Can harvest? " + _canBeHarvested.ToString());
     }
 }
