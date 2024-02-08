@@ -7,6 +7,11 @@ public class PlotBehaviour : MonoBehaviour
 
     private PlantBehaviour _plant;
     public PlantBehaviour Plant { get { return _plant; } }
+    
+    private Color _originalColor;
+    private void Start() {
+        _originalColor = GetComponent<Renderer>().material.color;
+    }
 
     public void PlantSeed(GameObject plant)
     {
@@ -48,19 +53,23 @@ public class PlotBehaviour : MonoBehaviour
     [SerializeField]
     private GameObject _testPlant;
 
-    private void Update()
-    {
-        // debug stuff
-        if (Input.GetKeyUp(KeyCode.K))
-        {
-            PlantSeed(_testPlant);
-        }
-
-        if (Input.GetKeyUp(KeyCode.J))
-        {
-            Harvest();
-        }
+    private void Update() {
+        
     }
 
+    public void Highlight()
+    {
+        GetComponent<Renderer>().material.color = _originalColor * 1.2f;
+    }
+
+    public void Select()
+    {
+        GetComponent<Renderer>().material.color = _originalColor * 1.8f;
+    }
+
+    public void Deselect()
+    {
+        GetComponent<Renderer>().material.color = _originalColor;
+    }
 
 }

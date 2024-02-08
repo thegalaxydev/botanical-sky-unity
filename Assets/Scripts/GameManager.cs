@@ -1,6 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
 {
@@ -28,13 +31,30 @@ public class GameManager : MonoBehaviour
 	[SerializeField]
 	private GameObject _plotPrefab;
 
+	[SerializeField]
+	private LayerMask _plotLayer;
 
+	[SerializeField]
+	private GameObject _plotMenu;
 
-	private void Awake()
-	{
-	}
+	[SerializeField]
+	private Text _plotNameText;
 
+	[SerializeField]
+	private Text _plantNameText;
 
+	[SerializeField]
+	private Text _stageText;
+
+	[SerializeField]
+	private GameObject _actionButton;
+	[SerializeField]
+	private Text _actionText;
+
+	private string action = "Plant";
+
+	private GameObject _selectedPlot;
+	private List<GameObject> _plots = new List<GameObject>();
 	void Start()
 	{
 		SetupFarmForPlayer();
@@ -42,6 +62,73 @@ public class GameManager : MonoBehaviour
 
 	// Update is called once per frame
 	void Update()
+	{
+		foreach (GameObject plot in _plots)
+		{
+			if (plot == _selectedPlot)
+				continue;
+			plot.GetComponent<PlotBehaviour>().Deselect();
+		}
+
+		Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+		RaycastHit hit;
+		bool didHit = Physics.Raycast(ray, out hit, Mathf.Infinity, _plotLayer);
+
+		if (!didHit)
+			return;
+
+		
+		PlotBehaviour plotBehaviour = hit.collider.GetComponent<PlotBehaviour>();
+		if (hit.collider.gameObject != _selectedPlot)
+			plotBehaviour.Highlight();
+
+		if (Input.GetMouseButtonDown(0))
+		{
+			SelectPlot(hit.collider.gameObject);
+		}
+
+		if (_selectedPlot == null)
+			_plotMenu.SetActive(false);
+	}
+
+	public void SelectPlot(GameObject plot)
+	{
+		PlotBehaviour plotBehaviour = plot.GetComponent<PlotBehaviour>();
+		if (_selectedPlot == plot)
+		{
+			plotBehaviour.Deselect();
+			_selectedPlot = null;
+			return;
+		}
+		_selectedPlot = plot;
+		plotBehaviour.Select();
+
+		_plotMenu.SetActive(true);
+		_plotNameText.text = _selectedPlot.name;
+
+		_plantNameText.text = "";
+		_stageText.text = "";
+
+		_actionText.text = "Plant";
+		action = "Plant";
+		_actionButton.SetActive(true);
+		PlantBehaviour plant = _selectedPlot.GetComponent<PlotBehaviour>().Plant;
+		if (plant != null)
+		{
+			_actionButton.SetActive(false);
+			_plantNameText.text = plant.name;
+			_stageText.text = "Stage " + plant.Stage.ToString();
+			
+			if (plant.CanBeHarvested)
+			{
+				action = "Harvest";
+				_actionText.text = "Harvest";
+				_actionButton.SetActive(true);
+			}
+		}
+	}
+
+	private void PerformAction()
 	{
 		
 	}
@@ -75,7 +162,7 @@ public class GameManager : MonoBehaviour
 
 	public void SetupFarmForPlayer()
 	{
-		GameObject farm = Instantiate(_farmPrefab, _farmSpawnPosition, Quaternion.identity);
+		Instantiate(_farmPrefab, _farmSpawnPosition, Quaternion.identity);
 
 		Vector3 plotScale = _plotPrefab.transform.localScale;
 
@@ -84,6 +171,9 @@ public class GameManager : MonoBehaviour
 		for (int i = 0; i < plotGrid.Count; i++)
 		{
 			GameObject plot = Instantiate(_plotPrefab, plotGrid[i], Quaternion.identity);
+			plot.name = (i+1).ToString();
+			_plots.Add(plot);
+
 		}
 	}
 }
