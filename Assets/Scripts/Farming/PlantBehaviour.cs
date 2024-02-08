@@ -14,16 +14,23 @@ public class PlantBehaviour : MonoBehaviour
     [SerializeField, Tooltip("The total yield of the plant when harvested.")]
     private int _yield;
 
+    [SerializeField, Tooltip("The name of the plant.")]
+    private string _plantName = "Plant";
+
     private int _stage = 0;
     private bool _canBeHarvested = false;
     private float _elapsedTime = 0;
 
+    [SerializeField]
     private UnityEvent _onGrowth;
+
+    [SerializeField]
     private UnityEvent _onGrowthTemp;
 
     public int Stage { get { return _stage; } }
     public bool CanBeHarvested { get { return _canBeHarvested; } }
     public int Yield { get { return _yield; } }
+    public string PlantName { get { return _plantName; } }
 
     public void AddOnGrowthAction(UnityAction action) => _onGrowth.AddListener(action);
     public void AddOnGrowthTempAction(UnityAction action) => _onGrowthTemp.AddListener(action);

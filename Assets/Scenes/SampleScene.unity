@@ -767,6 +767,7 @@ MonoBehaviour:
   _stageText: {fileID: 543462227}
   _actionButton: {fileID: 417244662}
   _actionText: {fileID: 450137841}
+  _testPlant: {fileID: 6098356012975605556, guid: 82267975c3f919d41ad8e8b5cb511312, type: 3}
 --- !u!4 &1132744019
 Transform:
   m_ObjectHideFlags: 0
@@ -834,7 +835,7 @@ MonoBehaviour:
   m_ReferencePixelsPerUnit: 200
   m_ScaleFactor: 1
   m_ReferenceResolution: {x: 1920, y: 1080}
-  m_ScreenMatchMode: 0
+  m_ScreenMatchMode: 2
   m_MatchWidthOrHeight: 0.5
   m_PhysicalUnit: 3
   m_FallbackScreenDPI: 96
@@ -858,7 +859,7 @@ Canvas:
   m_OverrideSorting: 0
   m_OverridePixelPerfect: 0
   m_SortingBucketNormalizedSize: 0
-  m_AdditionalShaderChannelsFlag: 25
+  m_AdditionalShaderChannelsFlag: 0
   m_SortingLayerID: 0
   m_SortingOrder: 0
   m_TargetDisplay: 0

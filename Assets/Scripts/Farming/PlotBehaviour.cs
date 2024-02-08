@@ -13,18 +13,20 @@ public class PlotBehaviour : MonoBehaviour
         _originalColor = GetComponent<Renderer>().material.color;
     }
 
-    public void PlantSeed(GameObject plant)
+    public PlantBehaviour PlantSeed(GameObject plant)
     {
         if (_plant != null)
-            return;
+            return null;
 
         PlantBehaviour plantBehaviour = plant.GetComponent<PlantBehaviour>();
         if (plantBehaviour == null)
-            return;
+            return null;
 
         GameObject newPlant = Instantiate(plant, transform.position + new Vector3(0, transform.localScale.y / 2, 0), Quaternion.identity);
 
-        _plant = newPlant.GetComponent<PlantBehaviour>(); ;
+        _plant = newPlant.GetComponent<PlantBehaviour>();
+
+        return _plant;
     }
 
     public void Harvest()

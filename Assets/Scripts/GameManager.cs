@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.SocialPlatforms;
 using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
@@ -57,7 +58,10 @@ public class GameManager : MonoBehaviour
 	private List<GameObject> _plots = new List<GameObject>();
 	void Start()
 	{
+		_plotMenu.SetActive(false);
 		SetupFarmForPlayer();
+
+		_actionButton.GetComponent<Button>().onClick.AddListener(PerformAction);
 	}
 
 	// Update is called once per frame
@@ -67,6 +71,7 @@ public class GameManager : MonoBehaviour
 		{
 			if (plot == _selectedPlot)
 				continue;
+
 			plot.GetComponent<PlotBehaviour>().Deselect();
 		}
 
@@ -91,15 +96,28 @@ public class GameManager : MonoBehaviour
 			_plotMenu.SetActive(false);
 	}
 
-	public void SelectPlot(GameObject plot)
+
+	public void SelectPlot(GameObject plot, bool force = false)
 	{
 		PlotBehaviour plotBehaviour = plot.GetComponent<PlotBehaviour>();
-		if (_selectedPlot == plot)
+		if (_selectedPlot == plot && !force)
 		{
 			plotBehaviour.Deselect();
 			_selectedPlot = null;
 			return;
 		}
+
+		foreach (GameObject p in _plots)
+		{
+			if (p == plot)
+				continue;
+
+			PlantBehaviour plantBehaviour = p.GetComponent<PlotBehaviour>().Plant;
+
+			if (plantBehaviour == null)
+				continue;
+		}
+
 		_selectedPlot = plot;
 		plotBehaviour.Select();
 
@@ -116,7 +134,7 @@ public class GameManager : MonoBehaviour
 		if (plant != null)
 		{
 			_actionButton.SetActive(false);
-			_plantNameText.text = plant.name;
+			_plantNameText.text = plant.PlantName;
 			_stageText.text = "Stage " + plant.Stage.ToString();
 			
 			if (plant.CanBeHarvested)
@@ -128,9 +146,29 @@ public class GameManager : MonoBehaviour
 		}
 	}
 
+	[SerializeField]
+	private GameObject _testPlant;
 	private void PerformAction()
 	{
-		
+		if (!_selectedPlot)
+			return;
+
+		PlotBehaviour plotBehaviour = _selectedPlot.GetComponent<PlotBehaviour>();
+
+		if (action == "Plant")
+		{
+			PlantBehaviour plant = plotBehaviour.PlantSeed(_testPlant);
+			SelectPlot(_selectedPlot, true);
+			plant.AddOnGrowthAction(() =>
+			{
+				SelectPlot(_selectedPlot, true);
+			});
+		}
+		else if (action == "Harvest")
+		{
+			plotBehaviour.Harvest();
+			SelectPlot(_selectedPlot, true);
+		}
 	}
 
     public static List<Vector3> GenerateGridPoints(Vector3 tileSize, Vector3 centerPosition, int spacer, int gridSize)

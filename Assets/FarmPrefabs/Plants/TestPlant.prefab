@@ -28,7 +28,7 @@ Transform:
   m_GameObject: {fileID: 2254724436203436331}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0.1, z: 0}
-  m_LocalScale: {x: 2, y: 0.2, z: 2}
+  m_LocalScale: {x: 0.5, y: 0.2, z: 0.5}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 9104900076944344842}
@@ -125,7 +125,7 @@ Transform:
   m_GameObject: {fileID: 4039227112600843861}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 1.5, z: 0}
-  m_LocalScale: {x: 1, y: 3, z: 1}
+  m_LocalScale: {x: 0.25, y: 3, z: 0.25}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 9104900076944344842}
@@ -247,6 +247,13 @@ MonoBehaviour:
   - {fileID: 7687980350364093836}
   _growthTime: 5
   _yield: 2
+  _plantName: Test Plant
+  _onGrowth:
+    m_PersistentCalls:
+      m_Calls: []
+  _onGrowthTemp:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &7687980350364093836
 GameObject:
   m_ObjectHideFlags: 0
@@ -275,7 +282,7 @@ Transform:
   m_GameObject: {fileID: 7687980350364093836}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 2.5, z: 0}
-  m_LocalScale: {x: 1, y: 5, z: 1}
+  m_LocalScale: {x: 0.25, y: 5, z: 0.25}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 9104900076944344842}
