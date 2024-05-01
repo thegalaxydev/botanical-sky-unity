@@ -248,7 +248,7 @@ MonoBehaviour:
   _growthTime: 5
   _yield: 2
   _plantName: Test Plant
-  _worth: 0
+  _worth: 20
   _plantID: 0
   _onGrowth:
     m_PersistentCalls:
