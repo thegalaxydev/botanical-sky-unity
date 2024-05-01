@@ -5,73 +5,98 @@ using UnityEngine;
 public class PlotBehaviour : MonoBehaviour
 {
 
-    private PlantBehaviour _plant;
-    public PlantBehaviour Plant { get { return _plant; } }
-    
-    private Color _originalColor;
-    private void Start() {
-        _originalColor = GetComponent<Renderer>().material.color;
-    }
+	private PlantBehaviour _plant;
+	public PlantBehaviour Plant { get { return _plant; } }
+	
+	private Color _originalColor;
+	private void Start() {
+		_originalColor = GetComponent<Renderer>().material.color;
+	}
 
-    public PlantBehaviour PlantSeed(GameObject plant)
-    {
-        if (_plant != null)
-            return null;
+	public PlantBehaviour PlantSeed(GameObject plant)
+	{
+		if (_plant != null)
+			return null;
 
-        PlantBehaviour plantBehaviour = plant.GetComponent<PlantBehaviour>();
-        if (plantBehaviour == null)
-            return null;
+		PlantBehaviour plantBehaviour = plant.GetComponent<PlantBehaviour>();
+		if (plantBehaviour == null)
+			return null;
 
-        GameObject newPlant = Instantiate(plant, transform.position + new Vector3(0, transform.localScale.y / 2, 0), Quaternion.identity);
+		GameObject newPlant = Instantiate(plant, transform.position + new Vector3(0, transform.localScale.y / 2, 0), Quaternion.identity);
 
-        _plant = newPlant.GetComponent<PlantBehaviour>();
+		_plant = newPlant.GetComponent<PlantBehaviour>();
 
-        return _plant;
-    }
+		_plant.SetStage(0);
 
-    public void Harvest()
-    {
-        Debug.Log("Attemptin to Harvest.");
-        if (_plant == null)
-        {
-            Debug.Log("Cannot harvest. No plant.");
-            return;
-        }
+		return _plant;
+	}
 
-        Debug.Log(_plant.CanBeHarvested);
-        if (!_plant.CanBeHarvested)
-        {
-            Debug.Log("Cannot harvest, plant cannot be harvested.");
-            return;
-        }
+	public void Harvest()
+	{
+		Debug.Log("Attemptin to Harvest.");
+		if (_plant == null)
+		{
+			Debug.Log("Cannot harvest. No plant.");
+			return;
+		}
+
+		if (!_plant.CanBeHarvested)
+		{
+			Debug.Log("Cannot harvest, plant cannot be harvested.");
+			return;
+		}
 
 
-        int yield = _plant.Yield;
+		int yield = _plant.Yield;
 
-        Destroy(_plant.gameObject);
-        _plant = null;
-    }
+		GameManager.Instance.AddMoney(yield * _plant.Worth);
 
-    [SerializeField]
-    private GameObject _testPlant;
+		Destroy(_plant.gameObject);
+		_plant = null;
+	}
 
-    private void Update() {
-        
-    }
+	[SerializeField]
+	private GameObject _testPlant;
 
-    public void Highlight()
-    {
-        GetComponent<Renderer>().material.color = _originalColor * 1.2f;
-    }
+	private void Update() {
+		
+	}
 
-    public void Select()
-    {
-        GetComponent<Renderer>().material.color = _originalColor * 1.8f;
-    }
+	public void Highlight()
+	{
+		GetComponent<Renderer>().material.color = _originalColor * 1.2f;
+	}
 
-    public void Deselect()
-    {
-        GetComponent<Renderer>().material.color = _originalColor;
-    }
+	public void Select()
+	{
+		GetComponent<Renderer>().material.color = _originalColor * 1.8f;
+	}
 
+	public void Deselect()
+	{
+		GetComponent<Renderer>().material.color = _originalColor;
+	}
+
+	public string SerializePlot()
+	{
+		int plantID = _plant == null ? -1 : _plant.PlantID;
+		int stage = _plant == null ? 0 : _plant.Stage;
+		bool canBeHarvested = _plant == null ? false : _plant.CanBeHarvested;
+
+		return $"{plantID.ToString()},{stage}";
+	}
+
+	public void DeserializePlot(string data)
+	{
+		string[] splitData = data.Split(',');
+
+		if (splitData[0] == "-1")
+			return;
+
+		GameObject plant = GameManager.Instance.PlantTypes[int.Parse(splitData[0])];
+		Debug.Log(plant == null);
+
+		PlantBehaviour newPlant = PlantSeed(plant);
+		newPlant.SetStage(int.Parse(splitData[1]));
+	}
 }

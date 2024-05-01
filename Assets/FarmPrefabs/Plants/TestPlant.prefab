@@ -18,7 +18,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &4555747131840395262
 Transform:
   m_ObjectHideFlags: 0
@@ -115,7 +115,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &5683002785708451189
 Transform:
   m_ObjectHideFlags: 0
@@ -248,6 +248,8 @@ MonoBehaviour:
   _growthTime: 5
   _yield: 2
   _plantName: Test Plant
+  _worth: 0
+  _plantID: 0
   _onGrowth:
     m_PersistentCalls:
       m_Calls: []
@@ -272,7 +274,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &2267736907712029552
 Transform:
   m_ObjectHideFlags: 0

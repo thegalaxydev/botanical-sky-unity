@@ -6,22 +6,17 @@ using UnityEngine.EventSystems;
 using UnityEngine.SocialPlatforms;
 using UnityEngine.UI;
 
-public class GameManager : MonoBehaviour
+public class GameManager : MonoBehaviour, IDataPersisetence
 {
 	// singleton instance
 	private static GameManager _instance;
-	public static GameManager Instance
-	{
-		get
-		{
-			if (_instance == null)
-			{
-				GameObject gameObject = new GameObject();
-				_instance = gameObject.AddComponent<GameManager>();
-			}
-			return _instance;
-		}
-	}
+	public static GameManager Instance {get; private set;}
+
+	// Player Data stuff
+
+	private int _money = 0;
+	public int Money => _money;
+	// yee haw
 
 	[SerializeField, Tooltip("The world position at which the farm should spawn. This shouldn't need to change.")]
 	private Vector3 _farmSpawnPosition = new Vector3(0, 0, 0);
@@ -54,13 +49,23 @@ public class GameManager : MonoBehaviour
 
 	private string action = "Plant";
 
+	[SerializeField, Tooltip("Types of plants that can be planted.")]
+	public GameObject[] PlantTypes;
+
 	private GameObject _selectedPlot;
 	private List<GameObject> _plots = new List<GameObject>();
+	private string[] _plotData;
+
+	private void Awake() {
+		if (Instance != null && Instance != this) 
+			Destroy(this); 
+		else 
+			Instance = this; 
+	}
+
 	void Start()
 	{
 		_plotMenu.SetActive(false);
-		SetupFarmForPlayer();
-
 		_actionButton.GetComponent<Button>().onClick.AddListener(PerformAction);
 	}
 
@@ -95,7 +100,29 @@ public class GameManager : MonoBehaviour
 		if (_selectedPlot == null)
 			_plotMenu.SetActive(false);
 	}
+	
+	public void LoadData(GameData data)
+	{
+		_money = data._money;
 
+		SetupFarmForPlayer(data._plotData);
+
+		Debug.Log("Loaded game data. Money: " + _money);
+	}
+
+	public void SaveData(ref GameData data)
+	{
+		data._money = _money;
+		string[] plotData = new string[_plots.Count];
+		for (int i = 0; i < _plots.Count; i++)
+		{
+			plotData[i] = _plots[i].GetComponent<PlotBehaviour>().SerializePlot();
+		}
+
+		data._plotData = plotData;
+
+		Debug.Log("Saved game data. Money: " + _money);
+	}
 
 	public void SelectPlot(GameObject plot, bool force = false)
 	{
@@ -146,8 +173,6 @@ public class GameManager : MonoBehaviour
 		}
 	}
 
-	[SerializeField]
-	private GameObject _testPlant;
 	private void PerformAction()
 	{
 		if (!_selectedPlot)
@@ -157,17 +182,22 @@ public class GameManager : MonoBehaviour
 
 		if (action == "Plant")
 		{
-			PlantBehaviour plant = plotBehaviour.PlantSeed(_testPlant);
+			PlantBehaviour plant = plotBehaviour.PlantSeed(PlantTypes[0]);
 			SelectPlot(_selectedPlot, true);
 			plant.AddOnGrowthAction(() =>
 			{
 				SelectPlot(_selectedPlot, true);
 			});
+
+			return;
 		}
-		else if (action == "Harvest")
+		
+		if (action == "Harvest")
 		{
 			plotBehaviour.Harvest();
 			SelectPlot(_selectedPlot, true);
+
+			return;
 		}
 	}
 
@@ -198,7 +228,7 @@ public class GameManager : MonoBehaviour
 		return gridPoints;
     }
 
-	public void SetupFarmForPlayer()
+	public void SetupFarmForPlayer(string[] plotData)
 	{
 		Instantiate(_farmPrefab, _farmSpawnPosition, Quaternion.identity);
 
@@ -211,7 +241,15 @@ public class GameManager : MonoBehaviour
 			GameObject plot = Instantiate(_plotPrefab, plotGrid[i], Quaternion.identity);
 			plot.name = (i+1).ToString();
 			_plots.Add(plot);
-
 		}
+		for (int i = 0; i < _plots.Count; i++)
+		{
+			_plots[i].GetComponent<PlotBehaviour>().DeserializePlot(plotData[i]);
+		}
+	}
+
+	public void AddMoney(int amount)
+	{
+		_money += amount;
 	}
 }
